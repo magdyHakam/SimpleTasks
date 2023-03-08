@@ -21,7 +21,7 @@ class CreateTasksTable extends Migration
             $table->foreign('assigned_to_id')->references('id')->on('users');
             $table->unsignedBigInteger('assigned_by_id');
             $table->foreign('assigned_by_id')->references('id')->on('users');
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 
