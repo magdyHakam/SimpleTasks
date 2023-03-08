@@ -3,12 +3,23 @@
 
 @section('content')
 
+    <style media="screen">
+        .errors{
+            text-align: left;
+        }
+    </style>
+
 
     <div class="container">
-      <div class="py-5 text-center">
+      <div class="py-5 ">
         <!-- <img class="d-block mx-auto mb-4" src="./Checkout example for Bootstrap_files/bootstrap-solid.svg" alt="" width="72" height="72"> -->
         <h2>New task form</h2>
         <!-- <p class="lead">Below is an example form built entirely with Bootstrap's form controls. Each required form group has a validation state that can be triggered by attempting to submit the form without completing it.</p> -->
+            @if($errors->any())
+            <div class="col-md-6 mt-5 alert alert-danger errors" role="alert">
+                {!! implode('', $errors->all('<div>:message</div>')) !!}
+            </div>
+            @endif
       </div>
 
       <div class="row">
@@ -38,7 +49,7 @@
                   <div class="col-md-4 mb-3">
                     <label for="country">Assigned by (non-admin user)</label>
                     <select name="assigned_by_id" class="custom-select d-block w-100" id="country" required>
-                        <option value="0">Choose Admin...</option>
+                        <option value="">Choose Admin...</option>
                         @foreach ($admins as $admin)
                           <option value="{{ $admin->id }}">{{ $admin->name }}</option>
                         @endforeach

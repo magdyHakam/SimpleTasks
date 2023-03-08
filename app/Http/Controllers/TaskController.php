@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 use App\Models\Task;
 use App\Models\User;
@@ -38,7 +40,6 @@ class TaskController extends Controller
             ->take(10)
             ->orderBy('tasks_count', 'DESC')
             ->get();
-        // dd($top10UsersHolders);
 
         return view('tasks.statistics')
            ->with('users',$top10UsersHolders);
@@ -74,23 +75,26 @@ class TaskController extends Controller
      */
      public function store(Request $request)
      {
-         // dd($request->all());
-         // return view('tasks.create');
-
-        //  $validated = $request->validate([
-        //     'title' => 'required|max:255',
-        //     'description' => 'required',
-        //     'assigned_to_id' => 'required|exists:',
-        // ]);
-        //
-        // Validator::make($data, [
-        //     'email' => [
-        //         'required',
-        //         Rule::exists('staff')->where(function ($query) {
-        //             return $query->where('account_id', 1);
-        //         }),
-        //     ],
-        // ]);
+         $validate = Validator::make($request->all(), [
+                     'title' => 'required|min:3|max:255',
+                     // 'description' => '',
+                     'assigned_by_id' => [
+                                            'required',
+                                            Rule::exists('users', 'id')->where(function (Builder $query) {
+                                                return $query->where('is_admin', 1);
+                                            }),
+                                        ],
+                     'assigned_to_id' => [
+                                            'required',
+                                            Rule::exists('users', 'id')->where(function (Builder $query) {
+                                                return $query->where('is_admin', 0);
+                                            }),
+                                        ],
+                 ]);
+                 // dd($validate->errors());
+        if($validate->fails()){
+          return back()->withErrors($validate->errors())->withInput();
+        }
 
         $Task = Task::create([
             "title"=> $request->title,
