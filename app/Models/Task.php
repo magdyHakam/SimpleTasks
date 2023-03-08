@@ -2,17 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-// use Illuminate\Foundation\Auth\User as Authenticatable;
-// use Illuminate\Notifications\Notifiable;
-// use Laravel\Sanctum\HasApiTokens;
-
-// use App\Model\Task;
-
-class User extends Model
+class Task extends Model
 {
     use HasFactory;
 
@@ -25,8 +18,12 @@ class User extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'is_admin',
+        'title',
+        'description',
+        'assigned_to_id',
+        'assigned_by_id',
+        'created_at',
+        'updated_at',
     ];
 
     // /**
@@ -50,11 +47,20 @@ class User extends Model
 
 
 
+
     /**
-     * Get the tasks for the user.
+     * Get the Admin that assign the task.
      */
-    public function tasks()
+    public function admin()
     {
-        return $this->hasMany(Task::class, 'assigned_to_id');
+        return $this->belongsTo(User::class, 'assigned_by_id');
+    }
+
+    /**
+     * Get the Admin that own the task.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'assigned_to_id');
     }
 }
