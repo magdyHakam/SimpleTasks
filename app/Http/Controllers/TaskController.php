@@ -7,6 +7,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
+use Illuminate\Support\Facades\Cache;
+
 use App\Models\Task;
 use App\Models\User;
 
@@ -52,14 +54,18 @@ class TaskController extends Controller
      public function create()
      {
          // get all Admins
-         $admins = User::select('id', 'name', 'is_admin')
+         $admins = Cache::remember('admins', 86400, function() { // cache for 1 day (= 86400 sec.)
+             return User::select('id', 'name', 'is_admin')
                 ->where('is_admin', 1)
                 ->get();
+         });
 
          // get all Users
-         $users = User::select('id', 'name', 'is_admin')
-               ->where('is_admin', 0)
-               ->get();
+         $users = Cache::remember('users', 86400, function() { // cache for 1 day (= 86400 sec.)
+             return User::select('id', 'name', 'is_admin')
+                ->where('is_admin', 0)
+                ->get();
+         });
 
 
          return view('tasks.create')
