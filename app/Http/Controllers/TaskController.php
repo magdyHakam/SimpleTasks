@@ -41,7 +41,6 @@ class TaskController extends Controller
             ->having('tasks_count', '>', 0)
             ->take(10)
             ->orderBy('tasks_count', 'DESC')
-            ->groupBy('id')
             ->get();
 
         return view('tasks.statistics')
