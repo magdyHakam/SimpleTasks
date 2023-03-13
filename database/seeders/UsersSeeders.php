@@ -16,7 +16,7 @@ class UsersSeeders extends Seeder
     {
         $data = [];
 
-        for ($i=1; $i <= 10000; $i++) {
+        for ($i=1; $i <= 100; $i++) {
             $data[] = ['name'=>'User'.$i.' name', 'is_admin'=> 0];
         }
 
