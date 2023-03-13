@@ -4,9 +4,15 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
+// use Illuminate\Foundation\Testing\DatabaseMigrations;
+// use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ExampleTest extends TestCase
 {
+
+    use RefreshDatabase;
+
     /**
      * A basic test for statistics page.
      *
@@ -21,10 +27,10 @@ class ExampleTest extends TestCase
 
     /**
      * A basic test for Create task page.
-     *
+     * @test
      * @return void
      */
-    public function test_create_task_page()
+    public function user_can_view_create_task_page()
     {
         $response = $this->get('/create');
 
@@ -61,6 +67,11 @@ class ExampleTest extends TestCase
      */
     public function test_user_can_create_new_task()
     {
+        // Run Admins Seeder
+        $this->seed(\Database\Seeders\AdminsSeeders::class);
+        // Run Users Seeder
+        $this->seed(\Database\Seeders\UsersSeeders::class);
+
         $response = $this->withHeaders(['Accept' => 'application/json'])
                     ->post('/store', [
                 "title"=> 'Task Sample',
