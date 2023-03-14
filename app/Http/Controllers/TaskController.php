@@ -9,6 +9,8 @@ use Illuminate\Validation\Rule;
 
 use Illuminate\Support\Facades\Cache;
 
+use App\Events\TaskCreated;
+
 use App\Models\Task;
 use App\Models\User;
 
@@ -37,11 +39,13 @@ class TaskController extends Controller
     public function statistics()
     {
         // get top 10 users task holders
-        $top10UsersHolders = User::withCount('tasks')
-            ->having('tasks_count', '>', 0)
-            ->take(10)
-            ->orderBy('tasks_count', 'DESC')
-            ->get();
+        $top10UsersHolders =  Cache::rememberForever('Top10UsersStatistics', function () {
+            return User::withCount('tasks')
+                ->having('tasks_count', '>', 0)
+                ->take(10)
+                ->orderBy('tasks_count', 'DESC')
+                ->get();
+        });
 
         return view('tasks.statistics')
            ->with('users',$top10UsersHolders);
@@ -102,12 +106,21 @@ class TaskController extends Controller
           return back()->withErrors($validate->errors())->withInput();
         }
 
-        $Task = Task::create([
-            "title"=> $request->title,
-            "description"=> $request->description,
-            "assigned_to_id"=> $request->assigned_to_id,
-            "assigned_by_id"=> $request->assigned_by_id
-        ]);
+        try {
+            $Task = Task::create([
+                "title"=> $request->title,
+                "description"=> $request->description,
+                "assigned_to_id"=> $request->assigned_to_id,
+                "assigned_by_id"=> $request->assigned_by_id
+            ]);
+        } catch (\Exception $exception) {
+            return back()->withError($exception->getMessage())->withInput();
+        }
+
+         // Dispatching TeaskCreated Event
+         $job = (new \App\Jobs\UpdateStatisticsJob());
+         dispatch($job);
+
 
         return redirect('/');
 
