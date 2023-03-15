@@ -27,7 +27,7 @@
       </tbody>
     </table>
 
-    {{ $tasks->links('pagination::bootstrap-4')}}
+    {{ $tasks->links()}}
 </div>
 
 

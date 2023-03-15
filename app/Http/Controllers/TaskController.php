@@ -24,8 +24,7 @@ class TaskController extends Controller
     public function index()
     {
         // get all tasks
-        $tasks = Task::with('admin')->with('user')->paginate(10);
-        // dd($tasks);
+        $tasks = Task::with('admin')->with('user')->simplePaginate(10);
 
         return view('tasks.list')
            ->with('tasks',$tasks);
